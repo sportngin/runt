@@ -97,7 +97,7 @@ module Runt
     if @ajd
       return DPrecision::to_p(self.class.new!(@ajd + n, @of, @sg),@date_precision)
     else
-      return DPrecision::to_p(to_date,@date_precision)
+      return DPrecision::to_p(to_date + n.days,@date_precision)
     end
   end
 
