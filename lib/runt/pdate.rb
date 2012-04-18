@@ -24,7 +24,7 @@ module Runt
       alias_method :old_civil, :civil
 
       def civil(*args)
-	precision=nil
+	      precision=nil
         if(args[0].instance_of?(DPrecision::Precision))
           precision = args.shift
         else
@@ -67,10 +67,14 @@ module Runt
 
   def - (x)
     case x
-      when Numeric then
-	return self+(-x)
-      #FIXME!!
-      when Date;    return to_date - x.to_date
+    when Numeric then
+	    return self+(-x)
+    when Date then
+      if @ajd
+        return @ajd - x.ajd
+      else
+        return to_date - x.to_date
+      end
     end
     raise TypeError, 'expected numeric or date'
   end
@@ -90,7 +94,11 @@ module Runt
     if(block_given?)
       n=yield(n)
     end
-    return DPrecision::to_p(self.class.new!(@ajd + n, @of, @sg),@date_precision)
+    if @ajd
+      return DPrecision::to_p(self.class.new!(@ajd + n, @of, @sg),@date_precision)
+    else
+      return DPrecision::to_p(to_date,@date_precision)
+    end
   end
 
   def PDate.to_date(pdate)
