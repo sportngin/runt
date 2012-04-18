@@ -70,7 +70,7 @@ module Runt
       when Numeric then
 	return self+(-x)
       #FIXME!!
-      when Date;    return @ajd - x.ajd
+      when Date;    return to_date - x.to_date
     end
     raise TypeError, 'expected numeric or date'
   end
