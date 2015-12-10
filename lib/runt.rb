@@ -34,7 +34,6 @@
 require 'yaml'
 require 'time'
 require 'date'
-require 'date/format'
 require "runt/dprecision"
 require "runt/pdate"
 require "runt/temporalexpression"
