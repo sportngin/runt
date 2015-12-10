@@ -1,10 +1,14 @@
+$:.push File.expand_path("../lib", __FILE__)
+
+# Maintain your gem's version:
+require "runt/version"
+
 Gem::Specification.new do |s|
   s.name = %q{runt}
-  s.version = "0.7.4"
+  s.version = Runt::VERSION
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matthew Lipper"]
-  s.date = %q{2008-12-11}
   s.description = %q{}
   s.email = ["mlipper@gmail.com"]
   s.extra_rdoc_files = ["History.txt", "LICENSE.txt", "Manifest.txt", "README.txt"]

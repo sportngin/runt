@@ -1,0 +1,14 @@
+defaults:
+  deploy_cmds:
+    - gem build runt.gemspec
+    - fury push *.gem
+  before_deploy_cmds:
+    - /usr/local/bin/op tag-release
+    - sed -i "" -e "s/\".*/\"$(git tag| sort -n -t. -k1,1 -k2,2 -k3,3 | tail -1 | sed s/v//)\"/" lib/runt/version.rb
+    - git add lib/runt/version.rb
+    - git commit -m "Version Bump" && git push
+  after_deploy_cmds:
+    - rm *.gem
+environments:
+  -
+    gemfury: {}
