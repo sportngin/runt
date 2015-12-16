@@ -48,21 +48,21 @@ require "runt/expressionbuilder"
 # defines some new constants and exposes some already defined in the standard
 # library classes <tt>Date</tt> and <tt>DateTime</tt>.
 #
-# <b>See also</b> runt/sugar_rb which re-opens this module and adds 
+# <b>See also</b> runt/sugar_rb which re-opens this module and adds
 # some additional functionality
 #
 # <b>See also</b> date.rb
 #
 module Runt
-  
+
   VERSION = "0.7.1"
-  
+
   class << self
-    
+
     def day_name(number)
       Date::DAYNAMES[number]
     end
-    
+
     def month_name(number)
       Date::MONTHNAMES[number]
     end
@@ -74,7 +74,7 @@ module Runt
     def format_date(date)
       date.ctime
     end
-    
+
     #
     # Cut and pasted from activesupport-1.2.5/lib/inflector.rb
     #
@@ -82,7 +82,7 @@ module Runt
       if (number.to_i==-1)
 	'last'
       elsif (number.to_i==-2)
-	'second to last'  
+	'second to last'
       elsif (11..13).include?(number.to_i % 100)
 	"#{number}th"
       else
@@ -96,7 +96,7 @@ module Runt
     end
 
   end
-  
+
   #Yes it's true, I'm a big idiot!
   Sunday = Date::DAYNAMES.index("Sunday")
   Monday = Date::DAYNAMES.index("Monday")
@@ -155,7 +155,7 @@ module Runt
 end
 
 #
-# Add precision +Runt::DPrecision+ to standard library classes Date and DateTime 
+# Add precision +Runt::DPrecision+ to standard library classes Date and DateTime
 # (which is a subclass of Date). Also, add an inlcude? method for interoperability
 # with +Runt::TExpr+ classes
 #
@@ -170,37 +170,35 @@ class Date
   end
 
   def date_precision
-    return @date_precision unless @date_precision.nil? 
-    return Runt::DPrecision::DEFAULT 
-  end 	  
+    return @date_precision unless @date_precision.nil?
+    return Runt::DPrecision::DEFAULT
+  end
 end
 
 #
-# Add the ability to use Time class 
+# Add the ability to use Time class
 #
 # Contributed by Paul Wright
 #
 class Time
-  
+
   include Runt
 
   attr_accessor :date_precision
-  alias_method :old_initialize, :initialize
   def initialize(*args)
     if(args[0].instance_of?(Runt::DPrecision::Precision))
       @precision=args.shift
     else
       @precision=Runt::DPrecision::DEFAULT
     end
-    old_initialize(*args)
+    super
   end
-  
-  alias :old_to_yaml :to_yaml
+
   def to_yaml(options)
     if self.instance_variables.empty?
-      self.old_to_yaml(options)
+      super
     else
-      Time.old_parse(self.to_s).old_to_yaml(options)
+      Time.old_parse(self.to_s).to_yaml(options)
     end
   end
 
@@ -226,14 +224,14 @@ end
 #
 # Useful shortcuts!
 #
-# Contributed by Ara T. Howard who is pretty sure he got the idea from 
+# Contributed by Ara T. Howard who is pretty sure he got the idea from
 # somewhere else. :-)
 #
 class Numeric #:nodoc:
   def microseconds() Float(self  * (10 ** -6)) end unless self.instance_methods.include?('microseconds')
   def milliseconds() Float(self  * (10 ** -3)) end unless self.instance_methods.include?('milliseconds')
   def decades() (10 * self).years end unless self.instance_methods.include?('decades')
-  # This causes RDoc to hurl:  
+  # This causes RDoc to hurl:
   %w[
   microseconds milliseconds decades
   ].each{|m| alias_method m.chop, m}
