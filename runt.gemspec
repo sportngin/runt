@@ -34,4 +34,5 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<hoe>, [">= 1.8.2"])
   end
+  s.add_development_dependency(%q<test-unit>)
 end
