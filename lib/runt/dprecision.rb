@@ -15,7 +15,8 @@ module Runt
   # Author:: Matthew Lipper
   module DPrecision
 
-    def DPrecision.to_p(date,prec=DEFAULT)
+    def DPrecision.to_p(date,prec=nil)
+      prec ||= DEFAULT
 
       case prec
         when MIN then PDate.min(*DPrecision.explode(date,prec))
@@ -87,8 +88,8 @@ module Runt
 
       def Precision.week
         new(WEEK_PREC)
-      end 
-      
+      end
+
       def Precision.day
         new(DAY_PREC)
       end
