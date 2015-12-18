@@ -55,8 +55,6 @@ require "runt/expressionbuilder"
 #
 module Runt
 
-  VERSION = "0.7.1"
-
   class << self
 
     def day_name(number)
@@ -210,26 +208,28 @@ module TimeInstancePatches
     end
   end
 end
+
+module TimeClassPatches
+  def parse(*args)
+    precision=Runt::DPrecision::DEFAULT
+    if(args[0].instance_of?(Runt::DPrecision::Precision))
+      precision=args.shift
+    end
+    _parse=super
+    _parse.date_precision=precision
+    _parse
+  end
+end
+
 class Time
 
   include Runt
   include TimeInstancePatches
+  extend TimeClassPatches
 
   attr_accessor :date_precision
 
 
-  class << self
-    alias_method :old_parse, :parse
-    def parse(*args)
-      precision=Runt::DPrecision::DEFAULT
-      if(args[0].instance_of?(Runt::DPrecision::Precision))
-        precision=args.shift
-      end
-      _parse=old_parse(*args)
-      _parse.date_precision=precision
-      _parse
-    end
-  end
 
   def date_precision
     return @date_precision unless @date_precision.nil?
