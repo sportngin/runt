@@ -154,6 +154,16 @@ module Runt
 
 end
 
+module RangeIncludePatch
+  def include?(included)
+    super unless min.is_a?(Date) && max.is_a?(Date)
+    included >= min && included <= max
+  end
+end
+class Range
+  include RangeIncludePatch
+end
+
 #
 # Add precision +Runt::DPrecision+ to standard library classes Date and DateTime
 # (which is a subclass of Date). Also, add an inlcude? method for interoperability
@@ -180,11 +190,9 @@ end
 #
 # Contributed by Paul Wright
 #
-class Time
 
-  include Runt
+module TimeInstancePatches
 
-  attr_accessor :date_precision
   def initialize(*args)
     if(args[0].instance_of?(Runt::DPrecision::Precision))
       @precision=args.shift
@@ -201,6 +209,14 @@ class Time
       Time.old_parse(self.to_s).to_yaml(options)
     end
   end
+end
+class Time
+
+  include Runt
+  include TimeInstancePatches
+
+  attr_accessor :date_precision
+
 
   class << self
     alias_method :old_parse, :parse
