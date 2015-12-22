@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'baseexpressiontest'
 
 # Unit tests for REDay class
@@ -36,5 +34,5 @@ class REDayTest < BaseExpressionTest
     assert !expr.include?(@pdate_20040531), \
       "Expression #{expr.to_s} created with less_precise_match=false should not include any lower precision argument automatically"
   end
-  
+
 end

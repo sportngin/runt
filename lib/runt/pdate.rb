@@ -15,28 +15,28 @@ module Runt
   #
   #
   # Author:: Matthew Lipper
+ module DateTimePatch
+
+   def civil(*args)
+     if(args[0].instance_of?(DPrecision::Precision))
+       precision = args.shift
+     else
+       precision = DPrecision::SEC
+     end
+     _civil = super
+     _civil.date_precision = precision
+     _civil
+   end
+
+   def new(*args)
+     civil(*args)
+   end
+ end
   class PDate < DateTime
     include DPrecision
-
     attr_accessor :date_precision
-    
-    class << self
-      alias_method :old_civil, :civil
 
-      def civil(*args)
-	      precision=nil
-        if(args[0].instance_of?(DPrecision::Precision))
-          precision = args.shift
-        else
-          return PDate::sec(*args)
-        end
-        _civil = old_civil(*args)
-        _civil.date_precision = precision
-        _civil
-      end
-    end
-
-    class << self; alias_method :new, :civil end
+   extend DateTimePatch
 
     def include?(expr)
       eql?(expr)
@@ -51,7 +51,7 @@ module Runt
 	current_date = self.class.to_date(self)
 	return DPrecision::to_p((current_date>>n),@date_precision)
       when WEEK then
-	return new_self_plus(n*7)	
+	return new_self_plus(n*7)
       when DAY then
 	return new_self_plus(n)
       when HOUR then
@@ -80,14 +80,11 @@ module Runt
   end
 
   def <=> (other)
-    result = nil
-    if(other.respond_to?("date_precision") && other.date_precision>@date_precision)
-      result = super(DPrecision::to_p(other,@date_precision))
+    if other.respond_to?(:date_precision)
+      super(DPrecision::to_p(other,@date_precision))
     else
-      result = super(other)
+      super
     end
-    #puts "#{self.to_s}<=>#{other.to_s} => #{result}" if $DEBUG
-    result
   end
 
   def new_self_plus(n)
@@ -97,13 +94,17 @@ module Runt
     if @ajd
       return DPrecision::to_p(self.class.new!(@ajd + n, @of, @sg),@date_precision)
     else
-      return DPrecision::to_p(to_date + n.days,@date_precision)
+      return DPrecision::to_p((to_date + n),@date_precision)
     end
+  end
+
+  def to_date
+    PDate.to_date(self)
   end
 
   def PDate.to_date(pdate)
     if( pdate.date_precision > DPrecision::DAY) then
-      DateTime.new(pdate.year,pdate.month,pdate.day,pdate.hour,pdate.min,pdate.sec)
+      return DateTime.new(pdate.year,pdate.month,pdate.day,pdate.hour,pdate.min,pdate.sec)
     end
     return Date.new(pdate.year,pdate.month,pdate.day)
   end
@@ -119,7 +120,7 @@ module Runt
   def PDate.week( yr,mon,day,*ignored )
     #LJK: need to calculate which week this day implies,
     #and then move the day back to the *first* day in that week;
-    #note that since rfc2445 defaults to weekstart=monday, I'm 
+    #note that since rfc2445 defaults to weekstart=monday, I'm
     #going to use commercial day-of-week
     raw = PDate.day(yr, mon, day)
     cooked = PDate.commercial(raw.cwyear, raw.cweek, 1)
@@ -152,8 +153,8 @@ module Runt
   end
 
   #
-  # Custom dump which preserves DatePrecision   
-  # 
+  # Custom dump which preserves DatePrecision
+  #
   # Author:: Jodi Showers
   #
   def marshal_dump
@@ -161,13 +162,13 @@ module Runt
   end
 
   #
-  # Custom load which preserves DatePrecision   
-  # 
+  # Custom load which preserves DatePrecision
+  #
   # Author:: Jodi Showers
   #
   def marshal_load(dumped_obj)
     @date_precision, @ajd, @sg, @of=dumped_obj
   end
-  
+
 end
 end
